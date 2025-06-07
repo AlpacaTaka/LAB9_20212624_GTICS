@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Entity
 @Getter
@@ -28,7 +29,6 @@ public class Proveedor {
 
     @Column(name = "ruc")
     @Size(min = 11, max = 11, message = "El RUC debe tener exactamente 11 dígitos")
-    @Pattern(regexp = "\\d{11}", message = "El RUC debe contener solo números")
     private String ruc;
 
     private Integer telefono;
@@ -37,6 +37,7 @@ public class Proveedor {
 
     private String web;
 
+    @Size(max = 150, message = "La dirección no puede exceder los 150 caracteres")
     private String direccion;
 
     private String pais;
@@ -47,7 +48,8 @@ public class Proveedor {
 
     private String categoria;
 
-    private Double facturacion_dolares;
+    @Column(name = "facturacion_dolares", precision = 10, scale = 10)
+    private BigDecimal facturacion_dolares;  // Change to BigDecimal to match DECIMAL
 
     @Column(name = "fecha_registro")
     private LocalDateTime fecha_registro;
