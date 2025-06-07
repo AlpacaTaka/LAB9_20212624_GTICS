@@ -4,8 +4,10 @@ package com.example.lab9_20212624_gtics.controller;
 import com.example.lab9_20212624_gtics.entity.Proveedor;
 import com.example.lab9_20212624_gtics.repository.ProveedorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -30,21 +32,44 @@ public class LabController {
 
     //borrado logico de proveedor
     @PutMapping("/borrarproveedor/{id}")
-    public String borrarProveedor(@PathVariable Integer id) {
-        Proveedor proveedor = proveedorRepository.findById(id).orElse(null);
-        if (proveedor != null) {
-            proveedor.setEstado(false); // Asumimos que hay un campo 'activo' para el borrado lógico
-            proveedorRepository.save(proveedor);
-            return "Proveedor borrado lógicamente";
-        } else {
-            return "Proveedor no encontrado";
+    public ResponseEntity<HashMap<String, Object>> borrarProveedor(@PathVariable Integer id) {
+
+        try{
+            Proveedor proveedor = proveedorRepository.findById(id).orElse(null);
+            if (proveedor != null) {
+                proveedor.setEstado(false); // Asumimos que hay un campo 'activo' para el borrado lógico
+                proveedorRepository.save(proveedor);
+                HashMap<String, Object> response = new HashMap<>();
+                response.put("message", "Proveedor borrado lógicamente");
+                response.put("proveedorid", proveedor.getId());
+                return ResponseEntity.ok(response);
+            } else {
+                HashMap<String, Object> response = new HashMap<>();
+                response.put("message", "Proveedor no encontrado");
+                return ResponseEntity.status(404).body(response);
+            }
+        }
+        catch (Exception e) {
+            HashMap<String, Object> response = new HashMap<>();
+            response.put("message", "Error al borrar el proveedor");
+            return ResponseEntity.status(500).body(response);
         }
     }
-
     @PostMapping("/crearproveedor")
-    public String crearProveedor(@RequestBody Proveedor proveedor) {
-        proveedorRepository.save(proveedor);
-        return "Proveedor creado";
+    public ResponseEntity<HashMap<String, Object>> guardarProveedor(@RequestBody Proveedor proveedor) {
+
+        HashMap<String, Object> response = new HashMap<>();
+        //try-catch
+        try{
+            proveedorRepository.save(proveedor);
+            response.put("message", "Proveedor guardado");
+            response.put("proveedorid", proveedor.getId());
+            return ResponseEntity.ok(response);
+        }
+        catch (Exception e) {
+            response.put("message", "Error al guardar el proveedor: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
     }
 
     @PutMapping("/actualizarproveedor/{id}")
